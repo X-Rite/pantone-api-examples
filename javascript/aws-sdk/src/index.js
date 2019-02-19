@@ -1,3 +1,4 @@
+import AWS from 'aws-sdk';
 import { CognitoUserPool, AuthenticationDetails, CognitoUser } from "amazon-cognito-identity-js";
 
 import write from './write';
@@ -19,13 +20,16 @@ const cognitoUser = new CognitoUser({
 write('Logging');
 cognitoUser.authenticateUser(authenticationDetails, {
   onSuccess: (result) => {
-      var accessToken = result.getAccessToken().getJwtToken();
-      
-      /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer*/
-      var idToken = result.idToken.jwtToken;
-  
-      console.log(result);
-      write('Got user token');
+    write('Got user token');
+
+    AWS.config.region = config.REGION;
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId : config.IDENTITY_POOL_ID,
+      Logins : {
+        [`cognito-idp.${config.REGION}.amazonaws.com/${config.USER_POOL_ID}`]: result.getIdToken().getJwtToken(),
+      }
+    });
+
   },
 
   onFailure: (error) => {
