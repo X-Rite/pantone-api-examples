@@ -5,6 +5,7 @@ export default {
   IDENTITY_POOL_ID: 'eu-central-1:ed6e3ac3-eafd-44f9-97a0-0dd3ada6d3ae',
   USER_POOL_ID: 'eu-central-1_QyJ2z85xR',
   CLIENT_ID: '5rplgkpl99uor6hdsc6aidjlmq',
+  AUTH_TYPE: 'AWS_IAM',
 
   // User credentials
   USERNAME: 'gabrielenosso@gmail.com',

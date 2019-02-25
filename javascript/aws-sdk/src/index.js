@@ -1,5 +1,7 @@
 import AWS from 'aws-sdk';
 import { CognitoUserPool, AuthenticationDetails, CognitoUser } from "amazon-cognito-identity-js";
+import AWSAppSyncClient from 'aws-appsync'
+import gql from 'graphql-tag';
 
 import write from './write';
 import config from '../../config';
@@ -30,6 +32,34 @@ cognitoUser.authenticateUser(authenticationDetails, {
       }
     });
 
+    AWS.config.credentials.refresh((error) => {
+      if (error) {
+        write(error);
+      } else {
+        write('Logged in');
+        console.log(AWS.config.credentials);
+
+        const client = new AWSAppSyncClient({
+          url: config.API_ENDPOINT,
+          region: config.REGION,
+          auth: {
+            type: config.AUTH_TYPE,
+            credentials: AWS.config.credentials,
+          },
+        });
+    
+        client.query({
+          query: gql`
+            {
+              getBooks { title }
+            }
+          `
+        }).then((response) => {
+          write('Pantone API data:');
+          write(response.data.getBooks.map(x => x.title).join(', '));
+        });
+      };
+    });
   },
 
   onFailure: (error) => {

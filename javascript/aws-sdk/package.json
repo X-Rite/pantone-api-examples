@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "amazon-cognito-identity-js": "^3.0.7",
-    "aws-sdk": "^2.405.0"
+    "aws-appsync": "^1.7.1",
+    "aws-sdk": "^2.405.0",
+    "graphql-tag": "^2.10.1"
   },
   "devDependencies": {
     "html-webpack-plugin": "^3.2.0",
