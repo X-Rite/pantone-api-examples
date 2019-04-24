@@ -21,6 +21,12 @@ Auth.signIn(config.USERNAME, config.PASSWORD).then(data => {
   write(`Logged in: ${data.signInUserSession.idToken.payload.email}`);
   console.log(data);
 
+  /*
+    AWS Amplify manages the token refresh by itself,
+    as explained in the official documentation: https://aws-amplify.github.io/docs/js/authentication#managing-security-tokens
+    If you are using aws-amplify server side, you need to implement your own "storage", as shown in the link.
+  */
+
   write('Querying Pantone API');
   API.graphql(graphqlOperation(`{
     getBooks {
