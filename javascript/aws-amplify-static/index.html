@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8">
+    <title>Pantone API - Javascript usage example</title>
+  <body>
+
+    <script src="https://cdn.jsdelivr.net/npm/aws-amplify@1.1.26/dist/aws-amplify.min.js"></script>
+
+    <script>
+      var write = function(text) {
+        const node = document.createElement('div');
+        const textnode = document.createTextNode(text);
+        node.appendChild(textnode);
+        document.body.appendChild(node);
+      }
+    </script>
+
+    <script>
+      var config = {
+        // Pantone Authentication data
+        IDENTITY_POOL_ID: 'eu-central-1:dc85d588-71b3-46ee-bbe6-af24a8957add',
+        USER_POOL_ID: 'eu-central-1_furWNPtEv',
+        CLIENT_ID: '77g6o30bt4e3io00qpnv09nf0',
+        AUTH_TYPE: 'AWS_IAM',
+        REGION: 'eu-central-1',
+
+        // Pantone API data
+        API_ENDPOINT: 'https://ajwuyywqbzdpvnymnmwg7o3xq4.appsync-api.eu-central-1.amazonaws.com/graphql',
+
+        // User credentials
+        USERNAME: 'pantone.api.beta@gmail.com',
+        PASSWORD: 'tryAPIbeta1',
+      }
+    </script>
+
+    <script>
+      // import Amplify, { Auth, API, graphqlOperation } from 'aws-amplify';
+      const Amplify = window['aws-amplify'].default;
+      const Auth = window['aws-amplify'].Auth;
+      const API = window['aws-amplify'].API;
+      const graphqlOperation = window['aws-amplify'].graphqlOperation;
+
+      Amplify.configure({
+        Auth: {
+          identityPoolId: config.IDENTITY_POOL_ID,
+          region: config.REGION,
+          userPoolId: config.USER_POOL_ID,
+          userPoolWebClientId: config.CLIENT_ID,
+        },
+        aws_appsync_graphqlEndpoint: config.API_ENDPOINT,
+        aws_appsync_region: config.REGION,
+        aws_appsync_authenticationType: config.AUTH_TYPE,
+      });
+
+      write('Logging in');
+
+      Auth.signIn(config.USERNAME, config.PASSWORD).then(data => {
+        write(`Logged in: ${data.signInUserSession.idToken.payload.email}`);
+        console.log(data);
+
+        /*
+          AWS Amplify manages the token refresh by itself,
+          as explained in the official documentation: https://aws-amplify.github.io/docs/js/authentication#managing-security-tokens
+          If you are using aws-amplify server side, you need to implement your own "storage", as shown in the link.
+        */
+
+        write('Querying Pantone API');
+        API.graphql(graphqlOperation(`{
+          getBooks {
+            title
+          }
+        }`)).then((response) => {
+          write('Pantone API data:');
+          write(response.data.getBooks.map(x => x.title).join(', '));
+        });
+      });
+    </script>
+  </body>
+</html>
